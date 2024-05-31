@@ -8,7 +8,7 @@ from utils import Logger
 
 KEY, VALUE = 0, 1
 DIST, NEIGH = 0, 1
-RDD, LOOKUP = 0, 1
+T_SOURCE, T_LOOKUP = 0, 1
 
 SOURCE = "idealista"
 LOOKUP = "lookup_tables"
@@ -67,12 +67,12 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
             .keyBy(lambda x: (x["district"], x["neighborhood"]))
             .join(lookup)
             .map(
-                lambda x: x[VALUE][RDD]
+                lambda x: x[VALUE][T_SOURCE]
                 | {
-                    "district": x[VALUE][LOOKUP][DIST].di_re,
-                    "district_id": x[VALUE][LOOKUP][DIST]._id,
-                    "neighborhood": x[VALUE][LOOKUP][NEIGH].ne_re,
-                    "neighborhood_id": x[VALUE][LOOKUP][NEIGH]._id,
+                    "district": x[VALUE][T_LOOKUP][DIST].di_re,
+                    "district_id": x[VALUE][T_LOOKUP][DIST]._id,
+                    "neighborhood": x[VALUE][T_LOOKUP][NEIGH].ne_re,
+                    "neighborhood_id": x[VALUE][T_LOOKUP][NEIGH]._id,
                 }
             )
             # Ready to store it
@@ -82,7 +82,7 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
 
         # Append only if file already exists
         mode = "overwrite" if len(loaded) == 0 else "append"
-        idealista.write.parquet(formatted / SOURCE / "out", mode=mode)
+        idealista.write.parquet((formatted / SOURCE / "out").as_posix(), mode=mode)
         commited = list(idealista_files.keys())
         with log.get_log_file() as log_file:
             print(*commited, sep="\n", file=log_file)

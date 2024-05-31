@@ -1,14 +1,17 @@
 import argparse
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import formatted
 
 
 def retrive(args: argparse.Namespace):
     raise NotImplementedError("For a landing zone implemeentation refer to delivery 1.")
 
 
-def commit(args: argparse.Namespace): ...
+def commit(args: argparse.Namespace):
+    formatted.commit()
 
 
 def main(input_: list[str]):
