@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import formatted
+import exploitation
 
 
 def retrive(args: argparse.Namespace):
@@ -14,6 +15,10 @@ def commit(args: argparse.Namespace):
     formatted.commit()
 
 
+def extract(args: argparse.Namespace):
+    exploitation.extract()
+
+
 def main(input_: list[str]):
     parser = argparse.ArgumentParser()
 
@@ -22,6 +27,8 @@ def main(input_: list[str]):
     retrive_cmd.set_defaults(func=retrive)
     commit_cmd = subparsers.add_parser("commit")
     commit_cmd.set_defaults(func=commit)
+    commit_cmd = subparsers.add_parser("extract")
+    commit_cmd.set_defaults(func=extract)
 
     args = parser.parse_args(input_)
     if args.cmd is None:
