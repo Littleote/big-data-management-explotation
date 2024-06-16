@@ -42,11 +42,11 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
         .rdd
         # Standardise and version idealista files
         .map(lambda x: default | flatten(x) | {"queryDate": path.stem[:10]})
-        # Prevent PySpark from using queryDate as reference
+        # Prevent PySpark from using queryDate with pass by reference
         .cache()
         # For all files left to load
         for path in (landing / SOURCE).glob("*_idealista")
-        if path not in loaded
+        if path.stem not in loaded
     }
 
     if len(idealista_files) > 0:
@@ -92,3 +92,8 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
             print(*commited, sep="\n", file=log_file)
         return commited
     return []
+
+
+def reset(formatted: Path):
+    log = Logger(formatted / SOURCE)
+    log.clear()

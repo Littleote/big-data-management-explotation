@@ -28,3 +28,24 @@ def commit(*pipes: str):
             print(f"Failed to load {pipe}'s pipeline")
         except Exception as e:
             print(f"Failed to run pipeline {pipe} due to: {e}")
+
+
+def reset(*pipes: str):
+    """Reset pipelines (by default all defined pipelines) in formatted"""
+    formatted = Path("formatted").absolute()
+    if len(pipes) == 0:
+        pipes = [
+            dir_.stem
+            for dir_ in formatted.iterdir()
+            if dir_.is_dir() and (dir_ / "pipeline.py").exists()
+        ]
+    for pipe in pipes:
+        print("Reseting...")
+        try:
+            pipeline = importlib.import_module(f"formatted.{pipe}.pipeline")
+            pipeline.reset(formatted)
+            print(f"Reset pipeline {pipe}")
+        except ModuleNotFoundError:
+            print(f"Failed to load {pipe}'s pipeline")
+        except Exception as e:
+            print(f"Failed to reset pipeline {pipe} due to: {e}")

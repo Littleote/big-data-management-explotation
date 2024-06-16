@@ -75,3 +75,8 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
             print(modification, sep="\n", file=log_file)
         return [modification]
     return []
+
+
+def reset(formatted: Path):
+    log = Logger(formatted / SOURCE)
+    log.clear()

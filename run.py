@@ -12,11 +12,25 @@ def retrive(args: argparse.Namespace):
 
 
 def commit(args: argparse.Namespace):
-    formatted.commit()
+    if args.reset:
+        if len(args.pipe) == 0:
+            print("Are you sure you want to reset all pipelines in formatted? (y/n)")
+            if input().lower()[:1] != "y":
+                print("Canceled")
+                return
+        formatted.reset(*args.pipe)
+    formatted.commit(*args.pipe)
 
 
 def extract(args: argparse.Namespace):
-    exploitation.extract()
+    if args.reset:
+        if len(args.pipe) == 0:
+            print("Are you sure you want to reset all pipelines in exploitation? (y/n)")
+            if input().lower()[:1] != "y":
+                print("Canceled")
+                return
+        exploitation.reset(*args.pipe)
+    exploitation.extract(*args.pipe)
 
 
 def main(input_: list[str]):
@@ -26,9 +40,33 @@ def main(input_: list[str]):
     retrive_cmd = subparsers.add_parser("retrive")
     retrive_cmd.set_defaults(func=retrive)
     commit_cmd = subparsers.add_parser("commit")
+    commit_cmd.add_argument(
+        "--pipe",
+        type=lambda x: x.split(","),
+        metavar="PIPE1,...",
+        default=[],
+        help="Run commit only on the specified comma separated pipes",
+    )
+    commit_cmd.add_argument(
+        "--reset",
+        action="store_true",
+        help="Reset the files from the selected pipelines",
+    )
     commit_cmd.set_defaults(func=commit)
-    commit_cmd = subparsers.add_parser("extract")
-    commit_cmd.set_defaults(func=extract)
+    extract_cmd = subparsers.add_parser("extract")
+    extract_cmd.add_argument(
+        "--pipe",
+        type=lambda x: x.split(","),
+        metavar="PIPE1,...",
+        default=[],
+        help="Run extract only on the specified comma separated pipes",
+    )
+    extract_cmd.add_argument(
+        "--reset",
+        action="store_true",
+        help="Reset the files from the selected pipelines",
+    )
+    extract_cmd.set_defaults(func=extract)
 
     args = parser.parse_args(input_)
     if args.cmd is None:
