@@ -39,8 +39,8 @@ def reset(*pipes: str):
             for dir_ in formatted.iterdir()
             if dir_.is_dir() and (dir_ / "pipeline.py").exists()
         ]
+    print("Reseting...")
     for pipe in pipes:
-        print("Reseting...")
         try:
             pipeline = importlib.import_module(f"formatted.{pipe}.pipeline")
             pipeline.reset(formatted)
