@@ -38,12 +38,15 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
     idealista_files = {
         path.stem:
         # Load idealista files
-        spark.read.parquet(path.as_posix()).rdd
+        spark.read.parquet(path.as_posix())
+        .rdd
         # Standardise and version idealista files
         .map(lambda x: default | flatten(x) | {"queryDate": path.stem[:10]})
+        # Prevent PySpark from using queryDate as reference
+        .cache()
         # For all files left to load
         for path in (landing / SOURCE).glob("*_idealista")
-        if path.stem not in loaded
+        if path not in loaded
     }
 
     if len(idealista_files) > 0:
@@ -83,6 +86,7 @@ def commit(spark: SparkSession, landing: Path, formatted: Path):
         # Append only if file already exists
         mode = "overwrite" if len(loaded) == 0 else "append"
         idealista.write.parquet((formatted / SOURCE / "out").as_posix(), mode=mode)
+        _ = [rdd.unpersist() for rdd in idealista_files.values()]
         commited = list(idealista_files.keys())
         with log.get_log_file() as log_file:
             print(*commited, sep="\n", file=log_file)
