@@ -1,0 +1,3 @@
+scikit-learn
+python-duckdb
+joblib
