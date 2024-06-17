@@ -30,4 +30,7 @@ class Logger:
 
     def clear(self):
         """Clear all records from the log"""
-        os.remove(self.path / LOG)
+        try:
+            os.remove(self.path / LOG)
+        except Exception:
+            pass
